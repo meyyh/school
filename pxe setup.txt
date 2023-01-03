@@ -1,0 +1,110 @@
+#install packages
+sudo apt install -y make gcc binutils perl mtools genisoimage syslinux liblzma-dev isolinux nfs-kernel-server dnsmasq git build-essential isc-dhcp-server tftpd-hpa samba
+
+#configure dhcpserver/router
+sudo mv /etc/dhcp/dhcpd.conf{,.backup}
+sudo nano /etc/dhcp/dhcpd.conf
+
+{
+default-lease-time 600;
+max-lease-time 7200;
+authoritative;
+
+subnet 192.168.1.0 netmask 255.255.255.0 {
+ range 192.168.1.100 192.168.1.200;
+ option routers 192.168.1.1;
+}
+
+#note set static ip to 192.168.1.1
+
+#bind dhcp to eth0
+sudo nano /etc/default/isc-dhcp-server
+{
+INTERFACESv4="eth0"
+}
+
+#tftp config
+sudo nano /etc/default/tftpd-hpa
+{
+TFTP_USERNAME="tftp"
+TFTP_DIRECTORY="/pxe-boot"
+TFTP_ADDRESS=":69"
+TFTP_OPTIONS="--secure"
+}
+
+#make main folder
+mkdir /pxe-boot
+
+#samba for win
+sudo nano /etc/samba/smb.conf
+{
+[pxe-boot]
+    comment = Samba on Ubuntu
+    path = /pxe-boot
+    read only = yes
+    browsable = yes
+}
+
+#configure ipxe
+cd
+git clone git://git.ipxe.org/ipxe.git
+cd ~/ipxe/src
+nano embed.ipxe
+{
+#!ipxe
+dhcp && goto netboot || goto dhcperror
+
+:dhcperror
+prompt --key s --timeout 10000 DHCP failed, hit 's' for the iPXE shell; reboot in 10 seconds && shell || reboot
+
+:netboot
+chain /pxe-boot/main.ipxe ||
+prompt --key s --timeout 10000 Chainloading failed, hit 's' for the iPXE shell; reboot in 10 seconds && shell || reboot
+}
+
+#compile ipxe
+make bin-x86_64-efi/ipxe.efi EMBED=embend.ipxe
+
+cp ~/ipxe/src/bin-x86_64-efi/ipxe.efi /pxe-boot/ipxe.efi
+
+#make main.ipxe
+sudo nano /pxe-boot/main.ipxe
+{
+#!ipxe
+:MENU
+menu
+item --gap -- ---------------- iPXE boot menu ----------------
+item hello        Hello world
+item shell          ipxe shell
+choose --default return --timeout 5000 target && goto ${target}
+
+:hello
+echo "hello world"
+boot ||
+goto MENU
+
+:shell
+shell ||
+goto MENU
+
+autoboot
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+restart services
+	
+sudo systemctl restart isc-dhcp-server.service
+sudo systemctl restart samba
