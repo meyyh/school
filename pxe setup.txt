@@ -65,7 +65,7 @@ prompt --key s --timeout 10000 Chainloading failed, hit 's' for the iPXE shell; 
 }
 
 #compile ipxe
-make bin-x86_64-efi/ipxe.efi EMBED=embend.ipxe
+make bin-x86_64-efi/ipxe.efi EMBED=embed.ipxe
 
 cp ~/ipxe/src/bin-x86_64-efi/ipxe.efi /pxe-boot/ipxe.efi
 
