@@ -1,6 +1,10 @@
 #install packages
 sudo apt install -y make gcc binutils perl mtools genisoimage syslinux liblzma-dev isolinux nfs-kernel-server dnsmasq git build-essential isc-dhcp-server tftpd-hpa samba
 
+#clone ipxe
+cd
+git clone git://git.ipxe.org/ipxe.git
+
 #configure dhcpserver/router
 sudo mv /etc/dhcp/dhcpd.conf{,.backup}
 sudo nano /etc/dhcp/dhcpd.conf
@@ -46,8 +50,6 @@ sudo nano /etc/samba/smb.conf
 }
 
 #configure ipxe
-cd
-git clone git://git.ipxe.org/ipxe.git
 cd ~/ipxe/src
 nano embed.ipxe
 {
