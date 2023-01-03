@@ -15,7 +15,7 @@ subnet 192.168.1.0 netmask 255.255.255.0 {
  option routers 192.168.1.1;
 }
 
-#note set static ip to 192.168.1.1
+#note set static ip to 192.168.1.1 and turn network off and on
 
 #bind dhcp to eth0
 sudo nano /etc/default/isc-dhcp-server
