@@ -21,6 +21,12 @@ subnet 192.168.1.0 netmask 255.255.255.0 {
 
 #note set static ip to 192.168.1.1 and turn network off and on
 
+#set static ip to mac address
+host archmachine {
+hardware ethernet $MACADDR;
+fixed-address 192.168.1.1;
+}
+
 #bind dhcp to eth0
 sudo nano /etc/default/isc-dhcp-server
 {
