@@ -33,7 +33,7 @@ TFTP_OPTIONS="--secure"
 }
 
 #make main folder
-mkdir /pxe-boot
+sudo mkdir /pxe-boot
 
 #samba for win
 sudo nano /etc/samba/smb.conf
