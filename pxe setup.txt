@@ -1,116 +1,145 @@
-#install packages
-sudo apt install -y make gcc binutils perl mtools genisoimage syslinux liblzma-dev isolinux nfs-kernel-server dnsmasq git build-essential isc-dhcp-server tftpd-hpa samba
+dnf install dhcp-server
 
-#clone ipxe
-cd
-git clone git://git.ipxe.org/ipxe.git
 
-#configure dhcpserver/router
-sudo mv /etc/dhcp/dhcpd.conf{,.backup}
 sudo nano /etc/dhcp/dhcpd.conf
 
-{
+subnet 192.168.1.0 netmask 255.255.255.0 {
+authoritative;
 default-lease-time 600;
 max-lease-time 7200;
-authoritative;
+ddns-update-style none;
+
+option domain-name-servers 192.168.1.1;
+option routers 192.168.1.1;
+
+# refer to RFC4578 & IANA DHCPv6 for possible arch option values
+option arch code 93 = unsigned integer 16;
 
 subnet 192.168.1.0 netmask 255.255.255.0 {
- range 192.168.1.100 192.168.1.200;
- option routers 192.168.1.1;
-} 
-host archmachine {
-hardware ethernet MACADDR;
-fixed-address 192.168.1.1;
+if option arch = 00:07 {
+# x64 UEFI
+filename "uefi/shimx64.efi";
+next-server 192.168.1.2;
+} else if option arch = 00:0b {
+# aarch64 UEFI
+filename "uefi/shimaa64.efi";
+server-name "192.168.1.2";
+} else {
+filename "pxelinux.0";
+next-server 192.168.1.2;
 }
 
-#note set static ip to 192.168.1.1 and turn network off and on
-
-#bind dhcp to eth0
-sudo nano /etc/default/isc-dhcp-server
-{
-INTERFACESv4="eth0"
 }
-
-#tftp config
-sudo nano /etc/default/tftpd-hpa
-{
-TFTP_USERNAME="tftp"
-TFTP_DIRECTORY="/pxe-boot"
-TFTP_ADDRESS=":69"
-TFTP_OPTIONS="--secure"
-}
-
-#make main folder
-sudo mkdir /pxe-boot
-
-#samba for win ADD TO BOTTOM
-sudo nano /etc/samba/smb.conf
-{
-[pxe-boot]
-    comment = Samba on Ubuntu
-    path = /pxe-boot
-    read only = yes
-    browsable = yes
-}
-
-#configure ipxe
-cd ~/ipxe/src
-nano embed.ipxe
-{
-#!ipxe
-dhcp && goto netboot || goto dhcperror
-
-:dhcperror
-prompt --key s --timeout 10000 DHCP failed, hit 's' for the iPXE shell; reboot in 10 seconds && shell || reboot
-
-:netboot
-chain /pxe-boot/main.ipxe ||
-prompt --key s --timeout 10000 Chainloading failed, hit 's' for the iPXE shell; reboot in 10 seconds && shell || reboot
-}
-
-#compile ipxe
-make bin-x86_64-efi/ipxe.efi EMBED=embed.ipxe
-
-sudo cp ~/ipxe/src/bin-x86_64-efi/ipxe.efi /pxe-boot/ipxe.efi
-
-#make main.ipxe
-sudo nano /pxe-boot/main.ipxe
-{
-#!ipxe
-:MENU
-menu
-item --gap -- ---------------- iPXE boot menu ----------------
-item hello        Hello world
-item shell          ipxe shell
-choose --default return --timeout 5000 target && goto ${target}
-
-:hello
-echo "hello world"
-boot ||
-goto MENU
-
-:shell
-shell ||
-goto MENU
-
-autoboot
+if option arch = 00:07 {
+# x64 UEFI
+filename "uefi/shim64.efi";
+next-server 192.168.1.2;
+} else if option arch = 00:0b {
+# aarch64 UEFI
+filename "uefi/shimaa64.efi";
+server-name "192.168.1.2";
+} else if option arch = 00:13 {
+# aarch64 UEFI HTTP
+option vendor-class-identifier "HTTPClient";
+filename "http://download.fedoraproject.org/pub/fedora/linux/releases/36/Server/aarch64/os/images/boot.iso";
+} else if option arch = 00:10 {
+# x64 UEFI HTTP
+option vendor-class-identifier "HTTPClient";
+filename "http://download.fedoraproject.org/pub/fedora/linux/releases/36/Server/x86_64/os/images/boot.iso";
+} else {
+filename "pxelinux.0";
+next-server 192.168.1.2;
 }
 
 
 
 
+systemctl start dhcpd
+systemctl enable dhcpd
+
+
+
+dnf install tftp-server
+systemctl start tftp.socket
+systemctl enable tftp.socket
+
+
+
+
+dnf install syslinux
+mkdir -p /var/lib/tftpboot/pxelinux.cfg
+cp /usr/share/syslinux/{pxelinux.0,menu.c32,vesamenu.c32,ldlinux.c32,libcom32.c32,libutil.c32} /var/lib/tftpboot/
+
+
+
+dnf install shim-x64 grub2-efi-x64 --installroot=/tmp/fedora --releasever 36
+
+
+
+mkdir -p /var/lib/tftpboot/uefi
+cp /tmp/fedora/boot/efi/EFI/fedora/{shimx64.efi,grubx64.efi} /var/lib/tftpboot/uefi/
+
+
+
+sudo nano /var/lib/tftpboot/pxelinux.cfg/default
+
+default vesamenu.c32
+prompt 1
+timeout 600
+
+label local
+menu label Boot from ^local drive
+menu default
+localboot 0xffff
+
+label linux
+menu label ^Install Fedora 36 64-bit
+kernel f36/vmlinuz
+append initrd=f36/initrd.img inst.stage2=https://download.fedoraproject.org/pub/fedora/linux/releases/36/Server/x86_64/os/ ip=dhcp
+
+label server
+menu label ^Install Fedora 36 ( Minimal Image )
+kernel f36/vmlinuz
+append initrd=f36/initrd.img inst.stage2=https://download.fedoraproject.org/pub/fedora/linux/releases/36/Server/x86_64/os/ ip=dhcp ks=https://example.com/fedora/kickstarts/minimal.ks
 
 
 
 
 
+sudo nano /var/lib/tftpboot/uefi/grub.cfg
+function load_video {
+	insmod efi_gop
+	insmod efi_uga
+	insmod video_bochs
+	insmod video_cirrus
+	insmod all_video
+}
+
+load_video
+set gfxpayload=keep
+insmod gzio
+
+menuentry 'Exit this grub' {
+        exit
+}
+
+menuentry 'Install Fedora 64-bit'  --class fedora --class gnu-linux --class gnu --class os {
+	linux $fw_path/f36/vmlinuz ip=dhcp inst.repo=https://download.fedoraproject.org/pub/fedora/linux/releases/36/Server/x86_64/os/
+	initrd $fw_path/f36/initrd.img
+}
+
+menuentry 'Install Fedora 36 Server'  --class fedora --class gnu-linux --class gnu --class os {
+	kernel f36/vmlinuz
+	append initrd=f36/initrd.img inst.repo=https://download.fedoraproject.org/pub/fedora/linux/releases/36/Server/x86_64/os/ ip=dhcp ks=https://git.fedorahosted.org/cgit/spin-kickstarts.git/plain/fedora-install-server.ks?h=f21
+
+
+
+
+mkdir -p /var/lib/tftpboot/f36
+wget https://download.fedoraproject.org/pub/fedora/linux/releases/36/Server/x86_64/os/images/pxeboot/vmlinuz -O /var/lib/tftpboot/f36/vmlinuz
+wget https://download.fedoraproject.org/pub/fedora/linux/releases/36/Server/x86_64/os/images/pxeboot/initrd.img -O /var/lib/tftpboot/f36/initrd.img
 
 
 
 
 
-
-restart services
-	
-sudo systemctl restart isc-dhcp-server.service
-sudo systemctl restart samba
