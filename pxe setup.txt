@@ -143,3 +143,54 @@ wget https://download.fedoraproject.org/pub/fedora/linux/releases/36/Server/x86_
 
 
 
+
+
+
+
+
+#########################################
+temp pxe thing
+
+yum install -y dnsmasq syslinux-tftpboot httpd
+
+mkdir -p /var/lib/tftpboot/
+
+wget https://mirrors.kernel.org/archlinux/iso/latest/archlinux-2023.04.01-x86_64.iso
+mount -o loop archlinux-2023.04.01-x86_64.iso /mnt
+cp -r /mnt/* /var/lib/tftpboot/
+umount /mnt
+
+echo "interface=eth0
+bind-interfaces
+dhcp-range=192.168.0.50,192.168.0.150,12h
+dhcp-boot=pxelinux.0
+enable-tftp
+tftp-root=/var/lib/tftpboot
+" > /etc/dnsmasq.conf
+
+mkdir -p /var/lib/tftpboot/pxelinux.cfg
+echo "DEFAULT archlinux
+LABEL archlinux
+KERNEL vmlinuz-linux
+APPEND initrd=initramfs-linux.img archisobasedir=arch archisolabel=ARCH_202304
+" > /var/lib/tftpboot/pxelinux.cfg/default
+
+cd /var/lib/tftpboot/
+wget https://mirrors.kernel.org/archlinux/iso/latest/arch/x86_64/vmlinuz-linux
+wget https://mirrors.kernel.org/archlinux/iso/latest/arch/x86_64/initramfs-linux.img
+
+systemctl start dnsmasq
+systemctl enable dnsmasq
+
+systemctl start httpd
+systemctl enable httpd
+
+
+
+
+#########################################
+
+
+
+
+
