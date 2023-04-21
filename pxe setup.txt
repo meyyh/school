@@ -151,7 +151,8 @@ wget https://download.fedoraproject.org/pub/fedora/linux/releases/36/Server/x86_
 #########################################
 temp pxe thing
 
-yum install -y dnsmasq syslinux-tftpboot httpd
+apt-get update
+apt-get install -y dnsmasq syslinux-common syslinux-tftp wget
 
 mkdir -p /var/lib/tftpboot/
 
@@ -182,9 +183,8 @@ wget https://mirrors.kernel.org/archlinux/iso/latest/arch/x86_64/initramfs-linux
 systemctl start dnsmasq
 systemctl enable dnsmasq
 
-systemctl start httpd
-systemctl enable httpd
-
+systemctl start tftpd-hpa
+systemctl enable tftpd-hpa
 
 
 
