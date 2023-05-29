@@ -1,1 +1,25 @@
-do the things
+testing this on a blueberry pi and the tftp server is a windows file share
+
+su -
+apt update && apt upgrade
+apt inatall cifs-utils dnsmasq
+
+mkdir /iso
+echo "//192.168.0.3/iso /iso cifs defaults,rw,username=user,password=pass 0 0" >> /etc/fstab
+mount -a
+
+vim /etc/dnsmasq.conf
+----------------------------------
+interface=eth0
+dhcp-range=start,end,mask,time
+dhcp-option=3,gateway
+dhcp-option=6,dns
+dhcp-authoritative
+tftp-root=/iso
+log-queries
+log-dhcp
+
+
+
+----------------------------------
+
