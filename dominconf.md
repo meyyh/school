@@ -1,15 +1,11 @@
-#config for pfsense as firewall 192.168.0.1
-		AD+DHCP+WDS 192.168.0.2
-		centos 8 stream pxeserver with ipxe loading netboot.xyz 192.168.0.3
+#config for pfsense as firewall 172.16.0.1
+		w2k19 AD1+DNS 172.16.0.2
+  		w2k19 AD2+DNS 172.16.0.3
+    		w2k19 wins wds and other 172.16.0.4
+		rocky linux IPXE+netboot.xyz 192.168.0.100
 
 
-
-
-
-#centos setup
-
-#set address to 192.168.0.3/24 and both gateway and dns server to 192.168.0.1 then restart the interface to apply changes
-
+#rocky setup
 
 dnf install dnsmasq ipxe-bootimgs 
 
