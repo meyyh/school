@@ -5,7 +5,8 @@ dnf install dnsmasq ipxe-bootimgs vim
 mkdir /tftp
 cp /usr/share/ipxe/{undionly.kpxe,ipxe-x86_64.efi} /tftp
 mkdir /tftp/menu
-edit /etc/sysconfig/selinux to diable selinux
+#edit /etc/sysconfig/selinux to diabled selinux
+reboot
 vim /tftp/menu/boot.ipxe
 ----------------------------------
 #!ipxe
