@@ -27,6 +27,7 @@ shell
 exit
 ----------------------------------
 
+sudo mv /etc/dnsmasq.conf /etc/dnsmasq.conf.bup
 sudo vim /etc/dnsmasq.conf
 ----------------------------------
 interface=eth0
