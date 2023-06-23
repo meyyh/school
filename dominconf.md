@@ -1,5 +1,4 @@
-view this boi 
-# RAW!
+# view this boi RAW!
 
 
 
@@ -89,33 +88,13 @@ use vms
 how to isolate and then access things
 	firewall rules
  	ssh/rdp into control machines inside of the isolated areas
-
---------------------------------------
-|		<-ssh
-|
-|
-|
-|
-|
-|
-|
-|
-
-
-
-
-
-
-
-
-
-
+	template
   
-templates
 
 
 
-funny to do
+
+# funny to do
 custom dns things
 	swap rick roll and darude sandstorm & dont make loop
  	blocklist
