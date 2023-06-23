@@ -12,7 +12,7 @@
 
 
 #rocky setup
-
+#make a non root user
 dnf install dnsmasq ipxe-bootimgs 
 
 mkdir -p /tftp/menu
