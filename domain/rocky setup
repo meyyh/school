@@ -1,11 +1,11 @@
-#install rocky with a non root admin and use them to do things
+#install rocky
 #set ip to 172.16.0.100
 #gateway to 172.16.0.1
-sudo dnf isntall dnsmasq ipxe-bootimgs vim
-sudo mkdir /tftp
-sudo cp /usr/share/ipxe/{undionly.kpxe,ipxe-x86_64.efi} /iso
-sudo mkdir /tftp/menu
-sudo vim /tftp/menu/boot.ipxe
+dnf isntall dnsmasq ipxe-bootimgs vim
+mkdir /tftp
+cp /usr/share/ipxe/{undionly.kpxe,ipxe-x86_64.efi} /tftp
+mkdir /tftp/menu
+vim /tftp/menu/boot.ipxe
 ----------------------------------
 #!ipxe
 
@@ -27,8 +27,8 @@ shell
 exit
 ----------------------------------
 
-sudo mv /etc/dnsmasq.conf /etc/dnsmasq.conf.bup
-sudo vim /etc/dnsmasq.conf
+mv /etc/dnsmasq.conf /etc/dnsmasq.conf.bup
+vim /etc/dnsmasq.conf
 ----------------------------------
 interface=eth0
 dhcp-range=start,end,mask,time
