@@ -1,4 +1,4 @@
-#install rocky
+#install rocky and allow ssh as root
 #set ip to 172.16.0.100
 #gateway to 172.16.0.1
 dnf isntall dnsmasq ipxe-bootimgs vim
