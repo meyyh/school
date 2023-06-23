@@ -1,1 +1,62 @@
+#install rocky with a non root admin and use them to do things
+#set ip to 172.16.0.100
+#gateway to 172.16.0.1
+sudo dnf isntall dnsmasq ipxe-bootimgs
+sudo mkdir /tftp
+sudo cp /usr/share/ipxe/{undionly.kpxe,ipxe-x86_64.efi} /iso
+sudo mkdir /tftp/menu
+sudo vim /tftp/menu/boot.ipxe
+----------------------------------
+#!ipxe
 
+:start
+menu PXE Boot Options
+item shell iPXE shell
+
+
+item exit  Exit to BIOS
+
+choose --default exit --timeout 10000 option && goto ${option}
+
+:shell
+shell
+
+
+
+:exit
+exit
+----------------------------------
+
+sudo vim /etc/dnsmasq.conf
+----------------------------------
+interface=eth0
+dhcp-range=start,end,mask,time
+dhcp-option=3,172.16.0.1
+dhcp-option=6,172.16.0.2
+dhcp-authoritative
+
+enable-tftp
+tftp-root=/tftp
+
+# Tag dhcp request from iPXE
+dhcp-match=set:ipxe,175
+
+# inspect the vendor class string and tag BIOS client
+dhcp-vendorclass=BIOS,PXEClient:Arch:00000
+
+# 1st boot file - Legacy BIOS client
+dhcp-boot=tag:!ipxe,tag:BIOS,undionly.kpxe
+
+# 1st boot file - EFI client
+# at the moment all non-BIOS clients are considered
+# EFI client
+dhcp-boot=tag:!ipxe,tag:!BIOS,ipxe.efi
+
+# 2nd boot file
+dhcp-boot=tag:ipxe,menu/boot.ipxe
+
+log-queries
+log-dhcp
+----------------------------------
+
+systemctl restart dnsmasq
