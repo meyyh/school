@@ -1,7 +1,7 @@
 #install rocky with a non root admin and use them to do things
 #set ip to 172.16.0.100
 #gateway to 172.16.0.1
-sudo dnf isntall dnsmasq ipxe-bootimgs
+sudo dnf isntall dnsmasq ipxe-bootimgs vim
 sudo mkdir /tftp
 sudo cp /usr/share/ipxe/{undionly.kpxe,ipxe-x86_64.efi} /iso
 sudo mkdir /tftp/menu
