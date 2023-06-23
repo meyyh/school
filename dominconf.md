@@ -1,3 +1,9 @@
+view this boi <font size="50">RAW!</font>
+
+
+
+
+
 #config for pfsense as firewall 172.16.0.1
 		w2k19 AD1+DNS 172.16.0.2
   		w2k19 AD2+DNS 172.16.0.3
