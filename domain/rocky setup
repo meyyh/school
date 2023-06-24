@@ -63,3 +63,8 @@ log-dhcp
 ----------------------------------
 
 systemctl restart dnsmasq
+
+firewall-cmd --add-service=dhcp --permanent
+firewall-cmd --add-service=tftp --permanent
+firewall-cmd --add-service=dns --permanent
+firewall-cmd --reload
