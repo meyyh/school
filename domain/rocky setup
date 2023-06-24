@@ -14,7 +14,7 @@ vim /tftp/menu/boot.ipxe
 :start
 menu PXE Boot Options
 item shell iPXE shell
-
+item netbootxyz load netboot.xyz
 
 item exit  Exit to BIOS
 
@@ -23,7 +23,8 @@ choose --default exit --timeout 10000 option && goto ${option}
 :shell
 shell
 
-
+:netbootxyz
+chain --autofree http://boot.netboot.xyz
 
 :exit
 exit
