@@ -53,5 +53,6 @@ custom dns things
 replace windows sounds
 
 
-win server 2k19-1
+# win server 2k19-1
 install wds wsus and group policy management
+install updates in C:\updates
