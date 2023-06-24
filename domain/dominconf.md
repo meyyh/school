@@ -11,55 +11,6 @@
 		rocky linux IPXE+netboot.xyz+dhcp 192.168.0.100
 
 
-#rocky setup
-#make a non root user
-dnf install dnsmasq ipxe-bootimgs 
-
-mkdir -p /tftp/menu
-chmod 777 /tftp
-
-
-vim /etc/dnsmasq.conf
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-# disable DNS server
-port=0
-
-# enable built-in tftp server
-enable-tftp
-tftp-root=/tftp
-vvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-systemctl enable dnsmasq
-systemctl start dnsmasq
-
-
-sudo firewall-cmd --add-service=dhcp --permanent
-sudo firewall-cmd --add-service=tftp --permanent
-sudo firewall-cmd --add-service=dns --permanent
-sudo firewall-cmd --reload
-
-
-cp /usr/share/ipxe/{undionly.kpxe,ipxe.efi} /tftp/
-
-vim /tftp/menu/boot.ipxe
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#!ipxe
-
-menu PXE Boot Options
-
-item shell iPXE shell
-item exit  Exit to BIOS
-
-choose --default exit --timeout 10000 option && goto ${option}
-
-:shell
-shell
-
-:exit
-exit
-
-##add netboot.xyz here
-vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-
 file share have one central file share with a folder everyone can access then have 5 gb folders auto created for each user plus a shared folder and a ro iso folder
 auto added folder done with quotas?
 linux isos should be handled by netboot.xyz but if need be we can put extra isos in the currently only win iso folder or have the pxe server host them
