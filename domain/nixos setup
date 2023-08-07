@@ -29,8 +29,8 @@ chain --autofree http://boot.netboot.xyz
 exit
 ----------------------------------
 
-mv /etc/dnsmasq.conf /etc/dnsmasq.conf.bup
-vim /etc/dnsmasq.conf
+
+vim /etc/dnsmasq-conf.conf
 ----------------------------------
 interface=eth0
 dhcp-range=172.16.11.0,172.16.99.250,255.255.0.0,48h
