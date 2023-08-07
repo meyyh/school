@@ -2,9 +2,10 @@
 #set ip to ?
 #gateway to 172.16.0.1
 mkdir /tftp
-cp school/ipxe/{undionly.kpxe,ipxe-x86_64.efi} /tftp
+cp school/ipxe/undionly.kpxe /tftp
+cp school/ipxe/x86_64/ipxe.efi /tftp
 mkdir /tftp/menu
-reboot
+
 vim /tftp/menu/boot.ipxe
 ----------------------------------
 #!ipxe
