@@ -1,7 +1,6 @@
-#install rocky and allow ssh as root
-#set ip to 172.16.0.100
+#install nixos with gui installer and no de
+#set ip to ?
 #gateway to 172.16.0.1
-dnf install dnsmasq ipxe-bootimgs vim
 mkdir /tftp
 cp /usr/share/ipxe/{undionly.kpxe,ipxe-x86_64.efi} /tftp
 mkdir /tftp/menu
