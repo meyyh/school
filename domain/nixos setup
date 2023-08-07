@@ -2,9 +2,8 @@
 #set ip to ?
 #gateway to 172.16.0.1
 mkdir /tftp
-cp /usr/share/ipxe/{undionly.kpxe,ipxe-x86_64.efi} /tftp
+cp school/ipxe/{undionly.kpxe,ipxe-x86_64.efi} /tftp
 mkdir /tftp/menu
-#edit /etc/sysconfig/selinux to diabled selinux
 reboot
 vim /tftp/menu/boot.ipxe
 ----------------------------------
