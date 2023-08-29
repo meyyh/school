@@ -5,3 +5,6 @@ router is opnsense 172.16.0.1
 pxeboot server is arch linux (because you cant stop me) 172.16.0.100
 
 we will be using [ipxe](https://ipxe.org) [chainloading](https://ipxe.org/howto/chainloading)
+
+once you have a booted arch system install 
+sudo pacman -S git    
