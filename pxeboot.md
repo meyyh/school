@@ -49,3 +49,32 @@ boot
 :exit
 exit
 ```
+
+and add the follwoing to /etc/dnsmasq.conf and make sure to edit the top 4 lines to be correct
+```
+interface=eth0
+dhcp-range=start,end,mask,time
+dhcp-option=3,gateway
+dhcp-option=6,dns
+dhcp-authoritative
+
+# Tag dhcp request from iPXE
+dhcp-match=set:ipxe,175
+
+# inspect the vendor class string and tag BIOS client
+dhcp-vendorclass=BIOS,PXEClient:Arch:00000
+
+# 1st boot file - Legacy BIOS client
+dhcp-boot=tag:!ipxe,tag:BIOS,undionly.kpxe
+
+# 1st boot file - EFI client
+# at the moment all non-BIOS clients are considered
+# EFI client
+dhcp-boot=tag:!ipxe,tag:!BIOS,ipxe.efi
+
+# 2nd boot file
+dhcp-boot=tag:ipxe,menu/boot.ipxe
+
+log-queries
+log-dhcp
+```
