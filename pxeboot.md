@@ -17,7 +17,7 @@ nginx as the web server for hosting the iso and ipxe files over http
 
 ## setup
 make the folders  
-mkdir -p/pxe/{menu,os}  
+mkdir -p /pxe/{menu,os}  
 now clone my repo  
 ```
 git clone https://github.com/meyyh/school
@@ -77,4 +77,46 @@ dhcp-boot=tag:ipxe,menu/boot.ipxe
 
 log-queries
 log-dhcp
+```
+
+edit /etc/nginx/nginx.xonf
+```
+user http;
+worker_processes auto;
+worker_cpu_affinity auto;
+
+events {
+    multi_accept on;
+    worker_connections 1024;
+}
+http {
+    charset utf-8;
+    sendfile on;
+    tcp_nopush on;
+    tcp_nodelay on;
+    server_tokens off;
+    log_not_found off;
+    types_hash_max_size 4096;
+    client_max_body_size 16M;
+
+    # MIME
+    include mime.types;
+    default_type application/octet-stream;
+
+    # logging
+    access_log /var/log/nginx/access.log;
+    error_log /var/log/nginx/error.log warn;
+
+    # load configs
+    include /etc/nginx/conf.d/*.conf;
+    include /etc/nginx/sites-enabled/*;
+    server {
+      listen  80;
+      server_name  172.16.0.100;
+
+      location / {
+        root /pxe
+      }
+    }
+}
 ```
