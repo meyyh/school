@@ -9,11 +9,11 @@ we will be using [ipxe](https://ipxe.org) [chainloading](https://ipxe.org/howto/
 once you have a booted arch system install these packages
 
 ```
-sudo pacman -S git dnsmasq nginx
+sudo pacman -S git dnsmasq apache
 ```
 git to clone this repo for ipxe files  
 dnsmasq for dhcp and netbooting  
-nginx as the web server for hosting the iso and ipxe files over http  
+apache as the web server for hosting the iso and ipxe files over http  
 
 ## setup
 make the folders  
@@ -54,8 +54,8 @@ and add the follwoing to /etc/dnsmasq.conf and make sure to edit the top 4 lines
 ```
 interface=eth0
 dhcp-range=start,end,mask,time
-dhcp-option=3,gateway
-dhcp-option=6,dns
+dhcp-option=3,gatewayip
+dhcp-option=6,dnsip
 dhcp-authoritative
 
 # Tag dhcp request from iPXE
@@ -79,44 +79,5 @@ log-queries
 log-dhcp
 ```
 
-edit /etc/nginx/nginx.xonf
-```
-user http;
-worker_processes auto;
-worker_cpu_affinity auto;
-
-events {
-    multi_accept on;
-    worker_connections 1024;
-}
-http {
-    charset utf-8;
-    sendfile on;
-    tcp_nopush on;
-    tcp_nodelay on;
-    server_tokens off;
-    log_not_found off;
-    types_hash_max_size 4096;
-    client_max_body_size 16M;
-
-    # MIME
-    include mime.types;
-    default_type application/octet-stream;
-
-    # logging
-    access_log /var/log/nginx/access.log;
-    error_log /var/log/nginx/error.log warn;
-
-    # load configs
-    include /etc/nginx/conf.d/*.conf;
-    include /etc/nginx/sites-enabled/*;
-    server {
-      listen  80;
-      server_name  172.16.0.100;
-
-      location / {
-        root /pxe
-      }
-    }
-}
-```
+edit /etc/httpd/conf/httpd.conf  
+and change documentroot and directory to /pxe
