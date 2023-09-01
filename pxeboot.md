@@ -17,7 +17,9 @@ apache as the web server for hosting the iso and ipxe files over http
 
 ## setup
 make the folders  
-mkdir -p /pxe/{menu,os}  
+```
+mkdir -p /pxe/{menu,os}
+```
 now clone my repo  
 ```
 git clone https://github.com/meyyh/school
